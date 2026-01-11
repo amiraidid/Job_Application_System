@@ -47,6 +47,7 @@ export class JobPostController {
   }
 
   @Get('company/:tenantId/fetch-jobs')
+  @UseGuards(TenantGuard)
   async getJobs(@Tenant() tenantId: string) {
     const jobs = await this.fetchJobs.execute(tenantId);
     return JobPostPersistenceMapper.toPersistenceArray(jobs);
@@ -65,6 +66,7 @@ export class JobPostController {
   }
 
   @Get('company/:tenantId/job/:id')
+  @UseGuards(TenantGuard)
   async findById(@Param('id') id: string, @Tenant() tenantId: string) {
     const res = await this.findJob.execute(id, tenantId);
     return JobPostPersistenceMapper.toPersistence(res);

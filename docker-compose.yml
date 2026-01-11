@@ -1,5 +1,6 @@
 services:
   app:
+    profiles: ["dev"]
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,16 +9,40 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: "postgresql://postgres:postgres@db:5432/job_app?schema=public"
+      DATABASE_URL: ${DATABASE_URL}
       PORT: "3000"
     ports:
-      - "3000:3000"
+      - "3030:3000"
     depends_on:
       - db
     volumes:
       - ./:/usr/src/app:cached
       - /usr/src/app/node_modules
-    command: sh -c "npm ci && npx prisma generate && npm run start:dev"
+    command: sh -c "npm ci && npx prisma generate && npx prisma migrate deploy && npm run start:dev"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app-prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: job-application-system:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: "production"
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: "3000"
+    ports:
+      - "3030:3000"
+    depends_on:
+      - db
+    command: sh -c "npx prisma migrate deploy && node dist/main"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
       interval: 10s

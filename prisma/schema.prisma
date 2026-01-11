@@ -33,7 +33,7 @@ model User {
   email        String           @unique
   password     String
   role         Role             @default(CANDIDATE)
-  comment      Comment[]
+  comment      Comment[]        
   job          JobPost[]
   applications JobApplication[]
   createdAt    DateTime         @default(now())
@@ -49,7 +49,7 @@ model JobPost {
   requirements    String
   isPublished     Boolean
   jobApplications JobApplication[]
-  company         Company          @relation(fields: [companyId], references: [id])
+  company         Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId       String
   user            User             @relation(fields: [userId], references: [id])
   userId          String
@@ -60,39 +60,39 @@ model JobApplication {
   id        String     @id @default(ulid())
   jobPost   JobPost    @relation(fields: [jobId], references: [id])
   jobId     String
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   resumeUrl String
   publicId  String
   status    Status     @default(SUBMITTED)
   interview Interview?
   comment   Comment[]
-  company   Company    @relation(fields: [companyId], references: [id])
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   appliedAt DateTime   @default(now())
 }
 
 model Interview {
   id             String         @id @default(uuid())
-  jobApplication JobApplication @relation(fields: [applicationId], references: [id])
+  jobApplication JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   applicationId  String         @unique
-  user           User           @relation(fields: [interviewerId], references: [id])
+  user           User           @relation(fields: [interviewerId], references: [id], onDelete: Cascade)
   interviewerId  String
   time           DateTime
   feedback       String
-  company        Company        @relation(fields: [companyId], references: [id])
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId      String
   createdAt      DateTime       @default(now())
 }
 
 model Comment {
   id            String         @id @default(uuid())
-  application   JobApplication @relation(fields: [applicationId], references: [id])
+  application   JobApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   applicationId String
-  user          User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String
   message       String
-  company       Company        @relation(fields: [companyId], references: [id])
+  company       Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId     String
   createdAt     DateTime       @default(now())
 }

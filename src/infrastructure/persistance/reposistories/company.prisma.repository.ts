@@ -8,6 +8,7 @@ import { CompanyMapperPersistence } from '../mappers/company-persistence.mapper'
 import { NotFoundError } from 'src/domain/core/errors/NotFoundError';
 import { InternalServerError } from 'src/domain/core/errors/InternalServerError';
 import { ConflictError } from 'src/domain/core/errors/ConflictError';
+import { ValidationError } from 'src/domain/core/errors/ValidationError';
 
 @Injectable()
 export class CompanyPrismaRepository implements ICompanyRepository {
@@ -49,6 +50,13 @@ export class CompanyPrismaRepository implements ICompanyRepository {
   }
 
   async GetCompanyById(companyId: string): Promise<CompanyEntity> {
+    if (
+      !companyId ||
+      typeof companyId !== 'string' ||
+      companyId.trim().length === 0
+    ) {
+      throw new ValidationError('Company id is required');
+    }
     try {
       const company = await this.prisma.company.findUnique({
         where: { id: companyId },

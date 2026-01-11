@@ -10,9 +10,14 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './presentation/modules/notifications.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './presentation/http/health.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     UserModule,
     JobPostModule,
     ApplicationJobModule,
@@ -31,7 +36,7 @@ import { APP_GUARD } from '@nestjs/core';
       ],
     }),
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,

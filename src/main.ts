@@ -10,9 +10,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalInterceptors(new ResponseInterceptor());
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
   app.useGlobalFilters(new AppExceptionFilter());
   app.enableCors();
+  // app.setGlobalPrefix('api');
+  app.enableShutdownHooks();
   app.use(helmet());
   const config = new DocumentBuilder()
     .setTitle('JOB APPLICATION APIs')
@@ -27,9 +36,9 @@ async function bootstrap() {
       'access-token',
     )
     .build();
-  const document = () => SwaggerModule.createDocument(app, config);
-  if (process.env.NODE_ENV !== 'Production') {
-    SwaggerModule.setup('api', app, document);
+  const document = SwaggerModule.createDocument(app, config);
+  if (process.env.NODE_ENV !== 'production') {
+    SwaggerModule.setup('api/docs', app, document);
   }
 
   await app.listen(process.env.PORT ?? 3000);

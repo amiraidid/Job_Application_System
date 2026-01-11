@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
 # Production stage
@@ -16,6 +17,7 @@ WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/prisma ./prisma
 
 EXPOSE 3000
 
